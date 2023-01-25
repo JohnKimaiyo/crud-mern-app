@@ -1,7 +1,17 @@
-const { model } = require("mongoose")
-
-function connectToDb(){
-    console.log("connect to mongodb")
+//load env vriable
+if (process.env.NODE_ENV != "producton") {
+  require("dotenv").config();
 }
 
-module.exports = connectToDb
+const mongoose = require("mongoose");
+
+async function connectToDb() {
+  try {
+    await mongoose.connect(process.env.DB_URL);
+    console.log("connected to database");
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+module.exports = connectToDb;
