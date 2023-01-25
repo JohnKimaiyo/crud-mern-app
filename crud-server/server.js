@@ -1,5 +1,8 @@
 //load env vriable
-require("dotenv").config();
+if (process.env.NODE_ENV != "producton") {
+  require("dotenv").config();
+}
+
 // import dependencies
 const express = require("express");
 
