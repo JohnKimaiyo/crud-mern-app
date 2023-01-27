@@ -1,5 +1,6 @@
 // import dependencies
 const express = require("express");
+const cors = require ("cors");
 const connectToDb = require("./config/connectToDb");
 const Note = require("./models/note");
 const notesController = require("./controllers/notesControllers");
@@ -8,7 +9,7 @@ const app = express();
 
 // configure express app
 app.use(express.json());
-
+app.use(cors());
 // connect to databse
 connectToDb();
 
