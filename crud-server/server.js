@@ -4,6 +4,8 @@ const cors = require ("cors");
 const connectToDb = require("./config/connectToDb");
 const Note = require("./models/note");
 const notesController = require("./controllers/notesControllers");
+const usersController = require("./controllers/userControllers")''
+
 // create an express app
 const app = express();
 
@@ -14,10 +16,15 @@ app.use(cors());
 connectToDb();
 
 /// Routing
+app.post("/signup", usersController.signup);
+app.post("/login",usersController.login);
+app.get("/logout",usersController.logout);
+
 app.get("/notes", notesController.fetchNotes);
 app.get("/notes/:id", notesController.fetchNote);
 app.post("/notes", notesController.createNote);
 app.put("/notes/:id", notesController.updateNote);
 app.delete("/notes/:id", notesController.deleteNote);
+
 // start out server
 app.listen(process.env.PORT);
