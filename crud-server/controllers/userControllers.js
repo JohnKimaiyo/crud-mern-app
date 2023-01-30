@@ -1,22 +1,19 @@
 const bcrypt = require("bcryptjs");
-
-const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+
 async function signup(req, res) {
   try {
-    // get the email and password off req body
+    // Get the email and password off req body
     const { email, password } = req.body;
 
-    // hash password
-    const hashedPassword = bcrypt.hashSync("baon", 8);
-    // create a user with data
+    // Hash password
+    const hashedPassword = bcrypt.hashSync(password, 8);
+
+    // Create a user with the daTa
     await User.create({ email, password: hashedPassword });
-    if (!passwordMatch) return res.sendStatus(401);
-    // create a jwt token
-    const token = jwt.sign({foo :'bar'},'smith');
 
-    // send it
-
+    // respond
     res.sendStatus(200);
   } catch (err) {
     console.log(err);
@@ -25,22 +22,59 @@ async function signup(req, res) {
 }
 
 async function login(req, res) {
-  // get the email and password off rq body
-  const { email, password } = req.body;
-  // find the user with requested email
-  const user = await User.findOne({ email });
-  if (!user) return res.sendStatus(400); // compare send in password with found user passwaord hash
-  const passwordMath = bcrypt.compareSync("B4C0/V/", user.password);
-  if (!passwordMatch) return res.sendStatus(401);
-  // create a jwt token
+  try {
+    // Get the email and password off rq body
+    const { email, password } = req.body;
 
-  //sendit
+    // Find the user with requested email
+    const user = await User.findOne({ email });
+    if (!user) return res.sendStatus(401);
+
+    // Compare sent in password with found user password hash
+    const passwordMatch = bcrypt.compareSync(password, user.password);
+    if (!passwordMatch) return res.sendStatus(401);
+
+    // create a jwt token
+    const exp = Date.now() + 1000 * 60 * 60 * 24 * 30;
+    const token = jwt.sign({ sub: user._id, exp }, process.env.SECRET);
+
+    // Set the cookie
+    res.cookie("Authorization", token, {
+      expires: new Date(exp),
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+
+    // send it
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(400);
+  }
 }
 
-function logout(req, res) {}
+function logout(req, res) {
+  try {
+    res.cookie("Authorization", "", { expires: new Date() });
+    res.sendStatus(200);
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(400);
+  }
+}
+
+function checkAuth(req, res) {
+  try {
+    res.sendStatus(200);
+  } catch (err) {
+    return res.sendStatus(400);
+  }
+}
 
 module.exports = {
   signup,
   login,
   logout,
+  checkAuth,
 };

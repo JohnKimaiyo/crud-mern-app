@@ -4,7 +4,8 @@ const cors = require ("cors");
 const connectToDb = require("./config/connectToDb");
 const Note = require("./models/note");
 const notesController = require("./controllers/notesControllers");
-const usersController = require("./controllers/userControllers")''
+const usersController = require("./controllers/userControllers");
+const requireAuth = require('./middleware/requireAuth');
 
 // create an express app
 const app = express();
@@ -19,6 +20,7 @@ connectToDb();
 app.post("/signup", usersController.signup);
 app.post("/login",usersController.login);
 app.get("/logout",usersController.logout);
+app.get('/check-auth',requireAuth,usersController.checkAuth);
 
 app.get("/notes", notesController.fetchNotes);
 app.get("/notes/:id", notesController.fetchNote);
